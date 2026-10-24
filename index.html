@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050816">
+<title>Digital 3D — Painel Futurista</title>
+
+<style>
+:root {
+  --azul: #00f7ff;
+  --azul-claro: #7df9ff;
+  --verde: #00ffae;
+  --roxo: #a855f7;
+  --fundo: #050816;
+  --painel: rgba(13, 22, 49, .72);
+  --borda: rgba(0, 247, 255, .35);
+  --texto-suave: #a4b5db;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  color: #fff;
+  background: radial-gradient(circle at 20% 10%, #0a1430 0%, #050816 55%, #02040c 100%);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Canvas de fundo */
+#fundo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+/* Camada de brilho ambiente */
+#glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(600px circle at 15% 20%, rgba(0, 247, 255, .10), transparent 60%),
+    radial-gradient(700px circle at 85% 80%, rgba(168, 85, 247, .10), transparent 60%);
+  animation: pulsoGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes pulsoGlow {
+  from { opacity: .6; transform: scale(1); }
+  to   { opacity: 1;  transform: scale(1.06); }
+}
+
+/* Layout */
+.app {
+  width: min(100% - 28px, 440px);
+  margin: auto;
+  padding: 32px 0 24px;
+  position: relative;
+}
+
+/* Cabeçalho */
+.topo {
+  text-align: center;
+  margin-bottom: 26px;
+  animation: subir .7s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.topo h1 {
+  color: var(--azul);
+  font-size: clamp(26px, 7vw, 32px);
+  letter-spacing: 4px;
+  font-weight: 800;
+  text-shadow:
+    0 0 12px rgba(0, 247, 255, .9),
+    0 0 36px rgba(0, 247, 255, .5),
+    0 0 70px rgba(0, 247, 255, .25);
+  animation: brilhoTitulo 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes brilhoTitulo {
+  from { text-shadow: 0 0 10px rgba(0,247,255,.7), 0 0 30px rgba(0,247,255,.35); }
+  to   { text-shadow: 0 0 18px rgba(0,247,255,1), 0 0 55px rgba(0,247,255,.6); }
+}
+
+.topo p {
+  color: var(--texto-suave);
+  margin-top: 10px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* Painéis */
+.painel {
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow:
+    0 0 0 1px rgba(0, 247, 255, .05),
+    0 18px 50px rgba(0, 0, 0, .55),
+    0 0 40px rgba(0, 247, 255, .08),
+    inset 0 0 30px rgba(0, 247, 255, .04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+  animation: subir .8s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.painel:nth-of-type(2) { animation-delay: .12s; }
+
+/* Linha superior animada */
+.painel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -40%;
+  width: 40%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--azul), transparent);
+  animation: varrer 4s linear infinite;
+}
+
+@keyframes varrer {
+  to { left: 120%; }
+}
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Relógio */
+.relogio { text-align: center; }
+
+.hora {
+  font-size: clamp(44px, 13vw, 64px);
+  font-weight: 700;
+  color: var(--azul);
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    0 0 14px rgba(0,247,255,.9),
+    0 0 40px rgba(0,247,255,.45);
+}
+
+.data {
+  margin-top: 10px;
+  color: #bdc9ed;
+  text-transform: capitalize;
+  font-size: 14px;
+  letter-spacing: .5px;
+}
+
+.etiqueta {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #a0b6e9;
+  margin-bottom: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.etiqueta::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--azul);
+  box-shadow: 0 0 10px var(--azul);
+  animation: pulsar 1.8s ease-in-out infinite;
+}
+
+@keyframes pulsar {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.7); }
+}
+
+/* Visor */
+.tela {
+  width: 100%;
+  height: 92px;
+  border: 1px solid #164b65;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #020a16, #020711);
+  color: var(--verde);
+  font-size: 36px;
+  font-weight: 600;
+  text-align: right;
+  padding: 16px;
+  margin-bottom: 16px;
+  outline: none;
+  box-shadow:
+    inset 0 0 22px rgba(0, 28, 44, .9),
+    0 0 18px rgba(0, 255, 174, .08);
+  font-variant-numeric: tabular-nums;
+  transition: box-shadow .3s;
+  letter-spacing: 1px;
+}
+
+.tela.flash {
+  box-shadow:
+    inset 0 0 26px rgba(0, 255, 174, .25),
+    0 0 26px rgba(0, 255, 174, .3);
+}
+
+/* Teclas */
+.teclas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.teclas button {
+  min-width: 0;
+  height: 62px;
+  border: 1px solid rgba(36, 75, 117, .9);
+  border-radius: 14px;
+  color: #e8f4ff;
+  background: linear-gradient(180deg, rgba(28, 48, 88, .95), rgba(16, 30, 58, .95));
+  font-size: 22px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform .1s, background .25s, box-shadow .25s, border-color .25s;
+  touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.teclas button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0,247,255,.35), transparent 65%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.teclas button:hover::after { opacity: .6; }
+
+.teclas button:active {
+  transform: scale(.92);
+  background: linear-gradient(180deg, #0a8ba6, #086c85);
+  box-shadow: 0 0 24px rgba(0, 247, 255, .55);
+  border-color: var(--azul);
+}
+
+.teclas .operador {
+  color: var(--azul);
+  background: linear-gradient(180deg, rgba(16, 44, 72, .98), rgba(10, 30, 52, .98));
+  font-weight: 600;
+}
+
+.teclas .limpar {
+  color: #ff7195;
+  font-weight: 700;
+}
+
+.teclas .limpar:active {
+  background: linear-gradient(180deg, #a6283f, #7a1c2e);
+  box-shadow: 0 0 24px rgba(255, 113, 149, .5);
+}
+
+.teclas .igual {
+  color: #00151b;
+  background: linear-gradient(180deg, #5ff8ff, #00d4e0);
+  font-weight: 800;
+  font-size: 24px;
+  border-color: rgba(125, 249, 255, .8);
+  box-shadow: 0 0 20px rgba(0, 247, 255, .35);
+}
+
+.teclas .igual:hover {
+  box-shadow: 0 0 32px rgba(0, 247, 255, .65);
+}
+
+.teclas .igual:active {
+  background: linear-gradient(180deg, #7df9ff, #00e5f0);
+  box-shadow: 0 0 40px rgba(0, 247, 255, .9);
+}
+
+/* Rodapé */
+.rodape {
+  text-align: center;
+  color: #5f719e;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 12px 0;
+  animation: subir 1s .25s cubic-bezier(.2,.8,.2,1) both;
+}
+
+/* Acessibilidade */
+button:focus-visible {
+  outline: 2px solid var(--azul-claro);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fundo"></canvas>
+<div id="glow"></div>
+
+<main class="app">
+
+  <header class="topo">
+    <h1>✦ DIGITAL 3D ✦</h1>
+    <p>Painel digital futurista</p>
+  </header>
+
+  <section class="painel relogio">
+    <div class="etiqueta">RELÓGIO DIGITAL</div>
+    <div class="hora" id="hora">00:00:00</div>
+    <div class="data" id="data">Carregando data...</div>
+  </section>
+
+  <section class="painel">
+    <div class="etiqueta">CALCULADORA DIGITAL</div>
+
+    <input
+      class="tela"
+      id="tela"
+      type="text"
+      value="0"
+      readonly
+      aria-label="Visor da calculadora"
+    >
+
+    <div class="teclas">
+      <button class="limpar" onclick="limpar()">AC</button>
+      <button class="operador" onclick="apagar()">⌫</button>
+      <button class="operador" onclick="adicionar('%')">%</button>
+      <button class="operador" onclick="adicionar('/')">÷</button>
+
+      <button onclick="adicionar('7')">7</button>
+      <button onclick="adicionar('8')">8</button>
+      <button onclick="adicionar('9')">9</button>
+      <button class="operador" onclick="adicionar('*')">×</button>
+
+      <button onclick="adicionar('4')">4</button>
+      <button onclick="adicionar('5')">5</button>
+      <button onclick="adicionar('6')">6</button>
+      <button class="operador" onclick="adicionar('-')">−</button>
+
+      <button onclick="adicionar('1')">1</button>
+      <button onclick="adicionar('2')">2</button>
+      <button onclick="adicionar('3')">3</button>
+      <button class="operador" onclick="adicionar('+')">+</button>
+
+      <button onclick="adicionar('(')">(</button>
+      <button onclick="adicionar('0')">0</button>
+      <button onclick="adicionar('.')">.</button>
+      <button class="igual" onclick="calcular()">=</button>
+    </div>
+  </section>
+
+  <footer class="rodape">
+    FUNDO ANIMADO • INTERFACE DIGITAL • 3D
+  </footer>
+
+</main>
+
+<script>
+/* ============ RELÓGIO ============ */
+const tela = document.getElementById("tela");
+const elHora = document.getElementById("hora");
+const elData = document.getElementById("data");
+
+let expressao = "";
+let resultadoFinal = false;
+
+function atualizarRelogio() {
+  const agora = new Date();
+  elHora.textContent = agora.toLocaleTimeString("pt-BR", { hour12: false });
+  elData.textContent = agora.toLocaleDateString("pt-BR", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric"
+  });
+}
+
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+
+/* ============ CALCULADORA ============ */
+function mostrar() {
+  tela.value = expressao || "0";
+}
+
+function piscar() {
+  tela.classList.add("flash");
+  setTimeout(() => tela.classList.remove("flash"), 180);
+}
+
+function adicionar(valor) {
+  if (resultadoFinal) {
+    if (/[0-9.(]/.test(valor)) expressao = "";
+    resultadoFinal = false;
+  }
+  if (expressao.length >= 100) return;
+  expressao += valor;
+  mostrar();
+}
+
+function limpar() {
+  expressao = "";
+  resultadoFinal = false;
+  mostrar();
+  piscar();
+}
+
+function apagar() {
+  expressao = expressao.slice(0, -1);
+  resultadoFinal = false;
+  mostrar();
+}
+
+function calcular() {
+  if (!expressao) return;
+  try {
+    let conta = expressao.replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
+    if (!/^[0-9+\-*/().\s]+$/.test(conta)) throw new Error("Expressão inválida");
+
+    const resultado = Function('"use strict"; return (' + conta + ')')();
+    if (typeof resultado !== "number" || !Number.isFinite(resultado)) {
+      throw new Error("Resultado inválido");
+    }
+
+    expressao = String(Number(resultado.toPrecision(12)));
+    resultadoFinal = true;
+    mostrar();
+    piscar();
+  } catch (erro) {
+    tela.value = "Erro";
+    expressao = "";
+    resultadoFinal = false;
+  }
+}
+
+/* ============ FUNDO ANIMADO 3D ============ */
+const canvas = document.getElementById("fundo");
+const ctx = canvas.getContext("2d");
+
+let largura, altura;
+let estrelas = [];
+let feixes = [];
+let mouse = { x: -9999, y: -9999 };
+let tempo = 0;
+
+function redimensionar() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  largura = window.innerWidth;
+  altura = window.innerHeight;
+
+  canvas.width = largura * dpr;
+  canvas.height = altura * dpr;
+  canvas.style.width = largura + "px";
+  canvas.style.height = altura + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Estrelas / partículas com profundidade
+  const qtd = Math.min(140, Math.floor((largura * altura) / 12000));
+  estrelas = Array.from({ length: qtd }, () => criarEstrela(true));
+
+  // Feixes de luz diagonais
+  feixes = Array.from({ length: 5 }, (_, i) => ({
+    x: Math.random() * largura,
+    y: Math.random() * altura,
+    vel: 0.25 + Math.random() * 0.4,
+    tam: 90 + Math.random() * 140,
+    angulo: Math.PI / 4 + (Math.random() - 0.5) * 0.4,
+    alpha: 0.03 + Math.random() * 0.05
+  }));
+}
+
+function criarEstrela(inicial) {
+  return {
+    x: Math.random() * largura,
+    y: inicial ? Math.random() * altura : altura + 10,
+    z: Math.random() * 2.2 + 0.3,      // profundidade
+    raio: Math.random() * 1.6 + 0.4,
+    fase: Math.random() * Math.PI * 2,
+    cor: Math.random() < 0.15 ? "168, 85, 247" : "0, 247, 255"
+  };
+}
+
+function desenharGrade(t) {
+  const horizonte = altura * 0.58;
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(0, 180, 255, 0.14)";
+  ctx.lineWidth = 1;
+
+  // Linhas verticais em perspectiva
+  for (let i = -12; i <= 12; i++) {
+    ctx.beginPath();
+    ctx.moveTo(largura / 2 + i * 10, horizonte);
+    ctx.lineTo(largura / 2 + i * (largura / 6), altura);
+    ctx.stroke();
+  }
+
+  // Linhas horizontais que se movem
+  for (let i = 0; i < 14; i++) {
+    const p = (i / 14 + (t * 0.18) % 1) % 1;
+    const y = horizonte + p * p * (altura - horizonte);
+    const alfa = 0.05 + p * 0.22;
+
+    ctx.strokeStyle = `rgba(0, 200, 255, ${alfa})`;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(largura, y);
+    ctx.stroke();
+  }
+
+  // Brilho no horizonte
+  const grad = ctx.createLinearGradient(0, horizonte - 40, 0, horizonte + 40);
+  grad.addColorStop(0, "rgba(0, 247, 255, 0)");
+  grad.addColorStop(0.5, "rgba(0, 247, 255, 0.10)");
+  grad.addColorStop(1, "rgba(0, 247, 255, 0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, horizonte - 40, largura, 80);
+
+  ctx.restore();
+}
+
+function desenharFeixes(dt) {
+  for (const f of feixes) {
+    f.y -= f.vel;
+    f.x += f.vel * 0.6;
+
+    if (f.y < -f.tam) {
+      f.y = altura + f.tam;
+      f.x = Math.random() * largura;
+    }
+    if (f.x > largura + f.tam) {
+      f.x = -f.tam;
+    }
+
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.angulo);
+    const grad = ctx.createLinearGradient(0, 0, f.tam, 0);
+    grad.addColorStop(0, `rgba(0, 247, 255, 0)`);
+    grad.addColorStop(0.5, `rgba(0, 247, 255, ${f.alpha})`);
+    grad.addColorStop(1, `rgba(0, 247, 255, 0)`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, -2, f.tam, 4);
+    ctx.restore();
+  }
+}
+
+function desenharEstrelas(t) {
+  for (const p of estrelas) {
+    // Movimento baseado na profundidade
+    p.y -= p.z * 0.55;
+    p.x += Math.sin(t + p.fase) * 0.35;
+
+    // Interação suave com o mouse
+    const dx = p.x - mouse.x;
+    const dy = p.y - mouse.y;
+    const dist2 = dx * dx + dy * dy;
+    if (dist2 < 14000) {
+      const f = (1 - dist2 / 14000) * 0.9;
+      p.x += (dx / Math.sqrt(dist2 || 1)) * f;
+      p.y += (dy / Math.sqrt(dist2 || 1)) * f;
+    }
+
+    if (p.y < -10) {
+      p.y = altura + 10;
+      p.x = Math.random() * largura;
+    }
+    if (p.x < -10) p.x = largura + 10;
+    if (p.x > largura + 10) p.x = -10;
+
+    const r = p.raio * p.z;
+    const alfa = Math.min(0.9, p.z / 2.4);
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${p.cor}, ${alfa})`;
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = `rgba(${p.cor}, 0.9)`;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+let ultimo = performance.now();
+
+function animar(agora) {
+  const dt = Math.min(40, agora - ultimo) / 16.67;
+  ultimo = agora;
+  tempo += 0.016;
+
+  ctx.clearRect(0, 0, largura, altura);
+
+  // Fundo base com vinheta
+  const bg = ctx.createRadialGradient(
+    largura / 2, altura * 0.35, 0,
+    largura / 2, altura * 0.5, Math.max(largura, altura) * 0.8
+  );
+  bg.addColorStop(0, "rgba(10, 20, 48, 0.9)");
+  bg.addColorStop(1, "rgba(2, 4, 12, 1)");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, largura, altura);
+
+  desenharGrade(tempo);
+  desenharFeixes(dt);
+  desenharEstrelas(tempo);
+
+  requestAnimationFrame(animar);
+}
+
+/* ============ INTERAÇÃO ============ */
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+window.addEventListener("mouseleave", () => {
+  mouse.x = -9999;
+  mouse.y = -9999;
+});
+
+window.addEventListener("touchmove", (e) => {
+  if (e.touches[0]) {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+window.addEventListener("touchend", () => {
+  mouse.x = -9999;
+  mouse.y = -9999;
+});
+
+let redimensionarTimeout;
+window.addEventListener("resize", () => {
+  clearTimeout(redimensionarTimeout);
+  redimensionarTimeout = setTimeout(redimensionar, 150);
+});
+
+/* ============ INICIAR ============ */
+redimensionar();
+requestAnimationFrame(animar);
+</script>
+
+</body>
+</html>
